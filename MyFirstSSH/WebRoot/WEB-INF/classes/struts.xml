@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE struts PUBLIC "-//Apache Software Foundation//DTD Struts Configuration 2.1//EN" "http://struts.apache.org/dtds/struts-2.1.dtd">
+<struts>
+
+	<!--下述语句是将struts2交给spring管理 -->
+	<constant name="struts.objectFactory" value="spring" />
+	
+	<!--将action内容放在定义为ssh包，此包继承structs-default包。name值与extends值可以使用默认值，如下所示 -->
+	<package name="ssh" extends="struts-default">
+	
+		<!--定义处理登陆的“伪”Action。
+		1、class属性不是实际实现类，而是spring容器中的Bean实例=一个伪控制器
+		2、class值与applicationContext.xml文件中该action的bean的id值相对应
+		3、由于spring代替struct管理控制器，所以此处的S_LoginAction只是一个代号
+		连接到applicationContext.xml中由spring来指定真正的实现类
+		4、
+		-->
+	    <action name="login_Action" class="spLoginAction">
+		
+		<!--result元素设置页面跳转值，其中name值为目标页面的字符串标识，如下，登录失败时回到fail.jsp页面，成功时，转向success.jsp页面 -->
+	    <result name="fail">/jsp/login/fail.jsp</result>
+	    <result name="success">/jsp/login/success.jsp</result>
+	    </action>
+	    
+	   
+	    
+	</package>
+
+</struts>    

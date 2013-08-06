@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--spring配置表
+1、每个bean对应一个java对象
+2、spring为每个bean元素创建一个java对象，就是一个bean实例
+-->
+
+<beans
+xmlns="http://www.springframework.org/schema/beans"
+xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+xmlns:p="http://www.springframework.org/schema/p"
+xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd">
+
+	<!--1/4、指明hibernate配置文件的位置 ，然后跳转到hibernate.cfg.xml中定义数据库信息
+	1、为bean实例赋值的方法有4种，value代表普通属性 
+	2、ref代表合作者(也可以自动装配bean与bean）
+	3、配置SessionFactory bean，IOC容器管理SF实例
+	4、
+	-->
+	<bean id="sessionFactory" class="org.springframework.orm.hibernate3.LocalSessionFactoryBean">
+	   <property name="configLocation" value="classpath:hibernate.cfg.xml" />
+	</bean>
+	
+	<!--2/4、定义DAO 
+	1、也可以不设置ref指定依赖bean，spring会自动装配。但会降低依赖关系的清晰性
+	 -->
+	<bean id="userDao" class="dao.system.UserDao">
+   		<property name="sessionFactory"> 
+       		<ref bean="sessionFactory"/>  
+   		</property>
+	</bean>
+	
+	<!--3/4、配置LoginAction.java类文件。
+	1、调用处理用户请求的action类即LoginAction.java
+	2、实际情况应该由业务逻辑组件来处理用户请求，而不是action类
+	3、必须配置scope，否则action成单例模式
+	property: 每次请求都创建一个实例 
+	request:在一次Http请求中，容器会返回该Bean的同一个实例，而对于不同的用户请求，会返回不同的实例。
+    4、在这个要定义一个逻辑组件UserService以及其reg对应的zjuserver实例，才能在LoginAction中声明和使用
+	 -->
+	<bean id="spLoginAction" class="action.login.LoginAction" scope="prototype">
+		<!--依赖注入业务逻辑组件 -->
+		<property name="UserService" ref="zjuserver" />
+	</bean>
+  
+    <!-- 4/4、部署一个业务逻辑组件zjuserver
+    1、在LoginAction中声明
+    	private UserService zjuserver = new UserService();
+    2、在UserService.java中定义，也就是实现类为UserService
+    3、设置了zjuserver bean与userDao bean有依赖关系
+    
+     -->
+	<bean id="zjuserver" class="service.system.UserService">
+        <property name="userDao">
+        	<ref bean="userDao"/>
+      	</property>
+  	</bean>
+</beans>
